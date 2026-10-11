@@ -1,0 +1,36 @@
+services:
+  api:
+    build: .
+    ports:
+     - "8000:8000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  redis:
+    image: redis:alpine
+
+  postgres:
+    image: postgres:18 
+    environment:
+      POSTGRES_USER: depscan
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U depscan -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+volumes:
+  postgres_data:

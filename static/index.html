@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>DepScan</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css?v=2"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- ================================================= -->
+<!-- HEADER -->
+<!-- ================================================= -->
+
+<header class="header">
+
+    <div class="logo">
+
+        <span class="logo-icon">
+            🛡
+        </span>
+
+        <span>
+            DepScan
+        </span>
+
+    </div>
+
+
+    <div class="header-right">
+
+        <span class="status-dot"></span>
+
+        Dependency Security Scanner
+
+    </div>
+
+</header>
+
+
+
+<!-- ================================================= -->
+<!-- ANALYZE PAGE -->
+<!-- ================================================= -->
+
+<div
+    id="analyze-page"
+    class="page"
+>
+
+    <div class="hero">
+
+        <div class="hero-icon">
+            🛡
+        </div>
+
+
+        <h1>
+            Secure Your Dependencies
+        </h1>
+
+
+        <p>
+            Analyze a GitHub repository for
+            dependency vulnerabilities,
+            security risks and outdated packages.
+        </p>
+
+
+        <div class="analyze-card">
+
+            <label for="repository-url">
+
+                GitHub Repository URL
+
+            </label>
+
+
+            <div class="input-row">
+
+                <input
+                    id="repository-url"
+                    type="text"
+                    placeholder="https://github.com/owner/repository"
+                >
+
+
+                <button
+                    id="analyze-btn"
+                    onclick="analyzeRepository()"
+                >
+
+                    Analyze Repository
+
+                </button>
+
+            </div>
+
+
+            <p
+                id="error-message"
+                class="error-message"
+            ></p>
+
+
+            <div
+                id="loading-message"
+                class="loading-message"
+            >
+
+                <div class="spinner"></div>
+
+                Analyzing repository...
+                This may take a few moments.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ================================================= -->
+<!-- DASHBOARD PAGE -->
+<!-- ================================================= -->
+
+<div
+    id="dashboard-page"
+    class="page hidden"
+>
+
+
+    <main class="container">
+
+
+        <!-- ========================================= -->
+        <!-- TITLE -->
+        <!-- ========================================= -->
+
+        <section class="page-title">
+
+            <div>
+
+                <h1>
+                    Security Dashboard
+                </h1>
+
+                <p>
+                    Dependency vulnerability analysis
+                </p>
+
+            </div>
+
+
+            <div class="title-actions">
+
+                <button
+                    class="secondary-btn"
+                    onclick="goToAnalyze()"
+                >
+                    + New Scan
+                </button>
+
+
+                <button
+                    class="refresh-btn"
+                    onclick="loadScan()"
+                >
+                    ↻ Refresh
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ========================================= -->
+        <!-- REPOSITORY -->
+        <!-- ========================================= -->
+
+        <section class="repository-card">
+
+            <div class="repo-icon">
+                📦
+            </div>
+
+
+            <div class="repo-info">
+
+                <span class="label">
+                    REPOSITORY
+                </span>
+
+
+                <h2 id="repository">
+                    Loading...
+                </h2>
+
+
+                <div class="scan-status">
+
+                    <span class="status-dot"></span>
+
+                    <span id="status">
+                        Loading...
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ========================================= -->
+        <!-- SUMMARY -->
+        <!-- ========================================= -->
+
+        <section class="summary-grid">
+
+
+            <div class="summary-card">
+
+                <div class="card-icon">
+                    📦
+                </div>
+
+
+                <div>
+
+                    <p class="card-label">
+                        DEPENDENCIES
+                    </p>
+
+
+                    <h2 id="dependencies">
+                        -
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+                <div class="card-icon danger-icon">
+                    ⚠
+                </div>
+
+
+                <div>
+
+                    <p class="card-label">
+                        VULNERABILITIES
+                    </p>
+
+
+                    <h2 id="vulnerabilities">
+                        -
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="summary-card score-card">
+
+                <div>
+
+                    <p class="card-label">
+                        SECURITY SCORE
+                    </p>
+
+
+                    <h2 id="security-score">
+                        -
+                    </h2>
+
+                </div>
+
+
+                <div
+                    id="security-level"
+                    class="security-badge"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+
+            <div class="summary-card">
+
+                <div class="card-icon">
+                    🕒
+                </div>
+
+
+                <div>
+
+                    <p class="card-label">
+                        SCAN TIME
+                    </p>
+
+
+                    <h2 id="scan-time">
+                        -
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ========================================= -->
+        <!-- SEVERITY -->
+        <!-- ========================================= -->
+
+        <section class="section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Vulnerability Severity
+                    </h2>
+
+                    <p>
+                        Distribution of detected vulnerabilities
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="severity-grid">
+
+
+                <div class="severity-card critical">
+
+                    <div class="severity-top">
+
+                        <span class="severity-name">
+                            CRITICAL
+                        </span>
+
+
+                        <span
+                            class="severity-number"
+                            id="critical"
+                        >
+                            0
+                        </span>
+
+                    </div>
+
+
+                    <div class="severity-bar">
+
+                        <div
+                            id="critical-bar"
+                            class="severity-fill"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="severity-card high">
+
+                    <div class="severity-top">
+
+                        <span class="severity-name">
+                            HIGH
+                        </span>
+
+
+                        <span
+                            class="severity-number"
+                            id="high"
+                        >
+                            0
+                        </span>
+
+                    </div>
+
+
+                    <div class="severity-bar">
+
+                        <div
+                            id="high-bar"
+                            class="severity-fill"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="severity-card medium">
+
+                    <div class="severity-top">
+
+                        <span class="severity-name">
+                            MEDIUM
+                        </span>
+
+
+                        <span
+                            class="severity-number"
+                            id="medium"
+                        >
+                            0
+                        </span>
+
+                    </div>
+
+
+                    <div class="severity-bar">
+
+                        <div
+                            id="medium-bar"
+                            class="severity-fill"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="severity-card low">
+
+                    <div class="severity-top">
+
+                        <span class="severity-name">
+                            LOW
+                        </span>
+
+
+                        <span
+                            class="severity-number"
+                            id="low"
+                        >
+                            0
+                        </span>
+
+                    </div>
+
+
+                    <div class="severity-bar">
+
+                        <div
+                            id="low-bar"
+                            class="severity-fill"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="severity-card unknown">
+
+                    <div class="severity-top">
+
+                        <span class="severity-name">
+                            UNKNOWN
+                        </span>
+
+
+                        <span
+                            class="severity-number"
+                            id="unknown"
+                        >
+                            0
+                        </span>
+
+                    </div>
+
+
+                    <div class="severity-bar">
+
+                        <div
+                            id="unknown-bar"
+                            class="severity-fill"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ========================================= -->
+        <!-- SECURITY SCORE -->
+        <!-- ========================================= -->
+
+        <section class="score-section">
+
+
+            <div class="score-circle">
+
+                <div
+                    class="score-number"
+                    id="score-circle-number"
+                >
+                    -
+                </div>
+
+
+                <div class="score-text">
+                    / 100
+                </div>
+
+            </div>
+
+
+
+            <div class="score-info">
+
+                <span class="label">
+                    OVERALL SECURITY
+                </span>
+
+
+                <h2 id="score-message">
+                    Calculating...
+                </h2>
+
+
+                <p>
+
+                    The security score considers
+                    vulnerability severity,
+                    dependency type and dependency depth.
+
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ========================================= -->
+        <!-- SCAN INFORMATION -->
+        <!-- ========================================= -->
+
+        <section class="section">
+
+            <div class="section-header">
+
+                <h2>
+                    Scan Information
+                </h2>
+
+            </div>
+
+
+            <div class="info-grid">
+
+
+                <div class="info-item">
+
+                    <span>
+                        Scan ID
+                    </span>
+
+
+                    <strong id="scan-id">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="info-item">
+
+                    <span>
+                        Status
+                    </span>
+
+
+                    <strong id="scan-status">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="info-item">
+
+                    <span>
+                        Started
+                    </span>
+
+
+                    <strong id="started-at">
+                        -
+                    </strong>
+
+                </div>
+
+
+
+                <div class="info-item">
+
+                    <span>
+                        Finished
+                    </span>
+
+
+                    <strong id="finished-at">
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ========================================= -->
+        <!-- VULNERABILITY TABLE -->
+        <!-- ========================================= -->
+
+        <section class="section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Vulnerabilities
+                    </h2>
+
+
+                    <p>
+                        Individual security issues detected
+                        during the scan
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Severity
+                            </th>
+
+                            <th>
+                                OSV ID
+                            </th>
+
+                            <th>
+                                Summary
+                            </th>
+
+                            <th>
+                                Dependency
+                            </th>
+
+                            <th>
+                                Version
+                            </th>
+
+                            <th>
+                                Type
+                            </th>
+
+                            <th>
+                                Depth
+                            </th>
+
+                            <th>
+                                Fixed Version
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="vulnerability-table">
+
+                        <tr>
+
+                            <td
+                                colspan="8"
+                                class="loading"
+                            >
+                                Loading vulnerabilities...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- ================================================= -->
+<!-- FOOTER -->
+<!-- ================================================= -->
+
+<footer>
+
+    <p>
+        DepScan • Dependency Security Scanner
+    </p>
+
+</footer>
+
+
+<script src="/static/script.js"></script>
+
+</body>
+
+</html>
